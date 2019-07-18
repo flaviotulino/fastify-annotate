@@ -1,12 +1,15 @@
-import glob from 'glob';
-import { join, normalize, resolve } from 'path';
-import * as errors from './errors';
+const glob = require('glob');
+const { join, normalize, resolve } = require('path');
+const errors = require('./errors');
 
 function url(...uri) {
   return normalize(join(...uri));
 }
 
-let _globalFastify, _globalPrefix = '';
+// eslint-disable-next-line
+let _globalFastify;
+// eslint-disable-next-line
+let _globalPrefix = '';
 
 const paths = [];
 
@@ -22,76 +25,64 @@ function addPath({ ...params }) {
   }
 }
 
-export function Get(path) {
-  return (controller, handler) => {
-    addPath({
-      controller,
-      handler,
-      method: 'GET',
-      path,
+module.exports.Get = path => (controller, handler) => {
+  addPath({
+    controller,
+    handler,
+    method: 'GET',
+    path,
+  });
+};
+
+module.exports.Post = path => (controller, handler) => {
+  addPath({
+    controller,
+    handler,
+    method: 'POST',
+    path,
+  });
+};
+
+module.exports.Put = path => (controller, handler) => {
+  addPath({
+    controller,
+    handler,
+    method: 'PUT',
+    path,
+  });
+};
+
+module.exports.Delete = path => (controller, handler) => {
+  addPath({
+    controller,
+    handler,
+    method: 'DELETE',
+    path,
+  });
+};
+
+module.exports.Validate = schema => (controller, handler) => {
+  addPath({
+    controller,
+    handler,
+    schema,
+  });
+};
+
+module.exports.Prefix = prefix => (constructor) => {
+  const routes = Object.values(paths[constructor.name]);
+
+  routes.forEach((route) => {
+    _globalFastify.route({
+      method: route.method,
+      url: url('/', _globalPrefix, prefix, route.path),
+      schema: route.schema,
+      handler: async (request, response) => route.controller[route.handler](request, response),
     });
-  };
-}
+  });
+};
 
-export function Post(path) {
-  return (controller, handler) => {
-    addPath({
-      controller,
-      handler,
-      method: 'POST',
-      path,
-    });
-  };
-}
-
-export function Put(path) {
-  return (controller, handler) => {
-    addPath({
-      controller,
-      handler,
-      method: 'PUT',
-      path,
-    });
-  };
-}
-
-export function Delete(path) {
-  return (controller, handler) => {
-    addPath({
-      controller,
-      handler,
-      method: 'DELETE',
-      path,
-    });
-  };
-}
-
-export function Validate(schema) {
-  return (controller, handler) => {
-    addPath({
-      controller,
-      handler,
-      schema,
-    });
-  };
-}
-
-export function Prefix(prefix) {
-  return (constructor) => {
-    const routes = Object.values(paths[constructor.name]);
-
-    routes.forEach((route) => {
-      _globalFastify.route({
-        method: route.method,
-        url: url('/', _globalPrefix, prefix, route.path),
-        schema: route.schema,
-        handler: async (request, response) => route.controller[route.handler](request, response),
-      });
-    });
-  };
-}
-
-export function registerRoutes(folder, fastify, prefix) {
+module.exports.registerRoutes = (folder, fastify, prefix) => {
   _globalFastify = fastify;
   _globalPrefix = prefix;
 
@@ -103,6 +94,6 @@ export function registerRoutes(folder, fastify, prefix) {
     // eslint-disable-next-line
     require(route);
   });
-}
+};
 
-export { errors };
+module.exports.errors = errors;

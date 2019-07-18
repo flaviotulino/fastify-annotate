@@ -5,18 +5,10 @@ function createError(code, message) {
   return error;
 }
 
-export function ErrorBadRequest(message) {
-  return createError(400, message);
-}
+module.exports.ErrorBadRequest = message => createError(400, message);
 
-export function ErrorUnauthorised(message) {
-  return createError(401, message);
-}
+module.exports.ErrorUnauthorised = message => createError(401, message);
 
-export function ErrorForbidden(message) {
-  return createError(403, message);
-}
+module.exports.ErrorForbidden = message => createError(403, message);
 
-export function ErrorNotFound(message) {
-  return createError(404, message);
-}
+module.exports.ErrorNotFound = message => createError(404, message);
