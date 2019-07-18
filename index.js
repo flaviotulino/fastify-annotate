@@ -82,6 +82,10 @@ module.exports.Prefix = prefix => (constructor) => {
   });
 };
 
+module.exports.Middleware = instance => {
+  _globalFastify.addHook('onRequest', instance);
+}
+
 module.exports.registerRoutes = (folder, fastify, prefix) => {
   _globalFastify = fastify;
   _globalPrefix = prefix;
