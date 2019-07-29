@@ -15,14 +15,17 @@ const paths = [];
 
 function addPath({ ...params }) {
   const { name } = params.controller.constructor;
+  const { handler } = params;
 
-  try {
-    paths[name][params.handler] = params;
-  } catch (e) {
-    paths[name] = {
-      [params.handler]: params,
-    };
+  if (!paths[name]) {
+    paths[name] = {};
   }
+
+  if (!paths[name][handler]) {
+    paths[name][handler] = {};
+  }
+
+  Object.assign(paths[name][handler], params);
 }
 
 module.exports.Get = path => (controller, handler) => {
@@ -69,6 +72,14 @@ module.exports.Validate = schema => (controller, handler) => {
   });
 };
 
+module.exports.OnRequest = onRequest => (controller, handler) => {
+  addPath({
+    controller,
+    handler,
+    onRequest,
+  });
+};
+
 module.exports.Prefix = prefix => (constructor) => {
   const routes = Object.values(paths[constructor.name]);
 
@@ -78,13 +89,10 @@ module.exports.Prefix = prefix => (constructor) => {
       url: url('/', _globalPrefix, prefix, route.path),
       schema: route.schema,
       handler: async (request, response) => route.controller[route.handler](request, response),
+      onRequest: async(request, response) => route.onRequest(request, response)
     });
   });
 };
-
-module.exports.Middleware = instance => {
-  _globalFastify.addHook('onRequest', instance);
-}
 
 module.exports.registerRoutes = (folder, fastify, prefix) => {
   _globalFastify = fastify;
