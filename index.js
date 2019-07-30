@@ -89,7 +89,9 @@ module.exports.Prefix = prefix => (constructor) => {
       url: url('/', _globalPrefix, prefix, route.path),
       schema: route.schema,
       handler: async (request, response) => route.controller[route.handler](request, response),
-      onRequest: async(request, response) => route.onRequest(request, response)
+      onRequest: route.onRequest
+        ? async (request, response) => route.onRequest(request, response)
+        : undefined,
     });
   });
 };
