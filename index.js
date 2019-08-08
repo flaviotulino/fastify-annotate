@@ -96,18 +96,20 @@ module.exports.Prefix = prefix => (constructor) => {
   });
 };
 
-module.exports.registerRoutes = (folder, fastify, prefix) => {
+module.exports.registerRoutes = (fastify, prefix, folder = null) => {
   _globalFastify = fastify;
   _globalPrefix = prefix;
 
-  const routes = glob.sync(`${folder}/**/*.js`, {
-    ignore: 'spec.js',
-  });
+  if (folder) {
+    const routes = glob.sync(`${folder}/**/*.js`, {
+      ignore: 'spec.js',
+    });
 
-  routes.forEach((route) => {
-    // eslint-disable-next-line
-    require(route);
-  });
+    routes.forEach((route) => {
+      // eslint-disable-next-line
+      require(route);
+    });
+  }
 };
 
 module.exports.errors = errors;
