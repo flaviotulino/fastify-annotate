@@ -100,7 +100,7 @@ module.exports.registerRoutes = (folder, fastify, prefix) => {
   _globalFastify = fastify;
   _globalPrefix = prefix;
 
-  const routes = glob.sync(`${resolve(folder)}/**/*.js`, {
+  const routes = glob.sync(`${folder}/**/*.js`, {
     ignore: 'spec.js',
   });
 
